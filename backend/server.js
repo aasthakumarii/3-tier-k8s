@@ -18,8 +18,8 @@ const pool = new Pool({
 });
 
 // Initialize database table if it doesn't exist
-const initDb = async (retries = 5) => {
-  while (retries) {
+const initDb = async () => {
+  while (true) {
     try {
       await pool.query(`
         CREATE TABLE IF NOT EXISTS items (
@@ -28,16 +28,18 @@ const initDb = async (retries = 5) => {
           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
       `);
-      console.log('Database initialized');
+
+      console.log("Database initialized");
       break;
     } catch (err) {
-      console.error('Error initializing database, retrying...', err);
-      retries -= 1;
-      await new Promise(res => setTimeout(res, 2000));
+      console.log("Database not ready. Retrying in 2 seconds...");
+      await new Promise(resolve => setTimeout(resolve, 2000));
     }
   }
 };
+
 initDb();
+
 
 // 1. Backend Status Endpoint
 app.get('/api/status/backend', (req, res) => {
